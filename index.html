@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no">
+  <meta name="format-detection" content="telephone=no,email=no,address=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="static/images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+  <title>大树精品课</title>
+  <meta itemprop="name" content="大树精品课"/>
+  <meta itemprop="image" content="https://activity.gkoudai.com/s/2018/04-03/static/images/300x300.png"/>
+  <meta name="description" itemprop="description" content="跟着大树从零开始学T+D"/>
+</head>
+<style>
+  img{
+    display: block;
+    width: 100%;
+  }
+
+</style>
+<body>
+<div><img src="static/images/宣传H5_01.png" alt="宣传H5_01"></div>
+<div><img src="static/images/宣传H5_02.png" alt="宣传H5_02"></div>
+<div><img src="static/images/宣传H5_03.png" alt="宣传H5_03"></div>
+<div><img src="static/images/宣传H5_04.png" alt="宣传H5_04"></div>
+<div style="position: relative">
+  <img src="static/images/宣传H5_05.png" alt="宣传H5_05">
+  <div id="bth" style="position: absolute;bottom: 0">
+    <img src="static/images/宣传H5_06.png" alt="按钮">
+  </div>
+</div>
+</body>
+<script>
+  /* eslint-disable */
+  var ua = window.navigator.userAgent;
+  var env = {
+    isApp: ua.toLowerCase().indexOf('gkoudai_') > -1,
+    isAndroid: ua.indexOf('Android') > -1 || ua.indexOf('Adr') > -1,
+    isIOS: !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+    isWeixin: !!ua.match(/MicroMessenger/i),
+  };
+
+  function goNativeLive() {
+    if (env.isApp && env.isAndroid) {
+      window.js_operation.goView('org.sojex.finance.trade.activities.LivePlayerActivity?roomId=45428997423105');
+    } else if (env.isApp && env.isIOS) {
+      window.js_operation.goView('GKDVideoLiveRoomViewController?roomId=45428997423105');
+    } else {
+      location.href = 'http://m.gkoudai.com/download/index.html';
+    }
+  }
+
+
+  function addEvent(elem, event, fn) {
+    if (elem.addEventListener) {
+      elem.addEventListener(event, fn, false);
+    } else if (elem.attachEvent) {
+      elem.attachEvent(`on${event}`, fn);
+    }
+  }
+
+  addEvent(document.getElementById('bth'), 'click', function () {
+    goNativeLive()
+  });
+
+
+  function ajax(){
+    var ajaxData = {
+      type:arguments[0].type || "GET",
+      url:arguments[0].url || "",
+      async:arguments[0].async || "true",
+      data:arguments[0].data || null,
+      dataType:arguments[0].dataType || "text",
+      contentType:arguments[0].contentType || "application/x-www-form-urlencoded",
+      beforeSend:arguments[0].beforeSend || function(){},
+      success:arguments[0].success || function(){},
+      error:arguments[0].error || function(){}
+    }
+    ajaxData.beforeSend()
+    var xhr = createxmlHttpRequest();
+    xhr.responseType=ajaxData.dataType;
+    xhr.open(ajaxData.type,ajaxData.url,ajaxData.async);
+    xhr.setRequestHeader("Content-Type",ajaxData.contentType);
+    xhr.send(convertData(ajaxData.data));
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if(xhr.status === 200){
+          ajaxData.success(xhr.response)
+        }else{
+          ajaxData.error()
+        }
+      }
+    }
+  }
+
+  function createxmlHttpRequest() {
+    if (window.ActiveXObject) {
+      return new ActiveXObject("Microsoft.XMLHTTP");
+    } else if (window.XMLHttpRequest) {
+      return new XMLHttpRequest();
+    }
+  }
+
+  function convertData(data){
+    if( typeof data === 'object' ){
+      var convertResult = "" ;
+      for(var c in data){
+        convertResult+= c + "=" + data[c] + "&";
+      }
+      convertResult=convertResult.substring(0,convertResult.length-1)
+      return convertResult;
+    }else{
+      return data;
+    }
+  }
+
+  function share(options) {
+    if (env.isWeixin) {
+      ajax({
+        type:"GET",
+        url:"//activity.gkoudai.com/getAccessToken/getSignPackage.php",
+        dataType:"json",
+        data:{url: location.href.split('#')[0]},
+        success:function(resp){
+          wx.config({
+            debug: process.env.NODE_ENV === 'development',
+            appId: resp.data.appId,
+            timestamp: resp.data.timestamp,
+            nonceStr: resp.data.nonceStr,
+            signature: resp.data.signature,
+            jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage'],
+          });
+
+          wx.ready(function() {
+            wx.onMenuShareTimeline({
+              title: options.title,           // 分享标题
+              link: options.link,             // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+              imgUrl: options.imgUrl,         // 分享图标
+              success: options.success,       // 用户确认分享后执行的回调函数
+              cancel: options.cancel,         // 用户取消分享后执行的回调函数
+            });
+
+            wx.onMenuShareAppMessage({
+              title: options.title,           // 分享标题
+              desc: options.desc,             // 分享描述
+              link: options.link,             // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+              imgUrl: options.imgUrl,         // 分享图标
+              type: options.type,             // 分享类型, music、video或link，不填默认为link
+              dataUrl: options.dataUrl,       // 如果 type 是 music 或 video，则要提供数据链接，默认为空
+              success: options.success,       // 用户确认分享后执行的回调函数
+              cancel: options.cancel,         // 用户取消分享后执行的回调函数
+            });
+          });
+
+          wx.error(function(res){
+            console.error(res);
+          });
+        },
+        error:function(res){
+          console.log(res)
+        }
+      })
+    } else if (env.isApp && window.js_operation) {
+      const iconUrl = 'http://112.124.5.210/img/koudai_icon.png';
+      const shareConfig = {
+        title: options.title,
+        isRefresh: 'false',
+        btn: [{
+          type: 'share',
+          icon: iconUrl,
+          text: '分享',
+          url: options.link,
+          content: options.desc,
+          image: options.imgUrl,
+          title: options.title,
+        }, {
+          type: 'browser', //打开浏览器
+          icon: iconUrl,
+          text: '浏览器打开',
+          url: options.link
+        }, {
+          type: 'copy', //复制链接
+          icon: iconUrl,
+          text: '复制',
+          url: options.link
+        }, {
+          type: 'webview', //打开客服
+          text: '联系客服',
+          url: 'http://activity.gkoudai.com/webim/im.html?tenantId=5633&accessToken=' + options.token,
+          icon: iconUrl
+        }]
+      };
+      js_operation.KD_JSBridge(JSON.stringify(shareConfig));
+    }
+  }
+
+  function getUrlParam(key) {
+    var reg = new RegExp(key + '=([^&]*)'),
+     results = location.href.match(reg);
+    return results ? results[1] : null;
+  }
+
+  share({
+    title: '大树精品课',
+    desc: '跟着大树从零开始学T+D',
+    link: 'https://activity.gkoudai.com/s/2018/04-03/index.html',
+    imgUrl: 'https://activity.gkoudai.com/s/2018/04-03/static/images/300x300.png',
+    token: getUrlParam('accessToken'),
+  })
+</script>
+</html>
